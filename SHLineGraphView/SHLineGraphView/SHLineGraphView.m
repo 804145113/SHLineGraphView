@@ -28,7 +28,8 @@
 
 #define BOTTOM_MARGIN_TO_LEAVE 30.0
 #define TOP_MARGIN_TO_LEAVE 30.0
-#define INTERVAL_COUNT 9
+#define INTERVAL_COUNT 5
+#define SCALEHEIGHT 6
 #define PLOT_WIDTH (self.bounds.size.width - _leftMarginToLeave)
 
 #define kAssociatedPlotObject @"kAssociatedPlotObject"
@@ -37,6 +38,7 @@
 @implementation SHLineGraphView
 {
   float _leftMarginToLeave;
+    BOOL _isMovePot;
 }
 - (instancetype)init {
   if((self = [super init])) {
@@ -54,6 +56,7 @@
 {
     self = [super initWithFrame:frame];
     if (self) {
+       _isMovePot = YES;
       [self loadDefaultTheme];
     }
     return self;
@@ -167,7 +170,6 @@
   //logic to fill the graph path, ciricle path, background path.
   [plot.plottingValues enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
     NSDictionary *dic = (NSDictionary *)obj;
-    
     __block NSNumber *_key = nil;
     __block NSNumber *_value = nil;
     
@@ -175,38 +177,67 @@
       _key = (NSNumber *)key;
       _value = (NSNumber *)obj;
     }];
-    
+      
     int xIndex = [self getIndexForValue:_key forPlot:plot];
-    
     //x value
     double height = self.bounds.size.height - BOTTOM_MARGIN_TO_LEAVE;
     double y = height - ((height / ([_yAxisRange doubleValue] + yIntervalValue)) * [_value doubleValue]);
     (plot.xPoints[xIndex]).x = ceil((plot.xPoints[xIndex]).x);
     (plot.xPoints[xIndex]).y = ceil(y);
   }];
-  
-  //move to initial point for path and background.
-  CGPathMoveToPoint(graphPath, NULL, _leftMarginToLeave, plot.xPoints[0].y);
-  CGPathMoveToPoint(backgroundPath, NULL, _leftMarginToLeave, plot.xPoints[0].y);
-  
+
   int count = _xAxisValues.count;
-  for(int i=0; i< count; i++){
+  for(int i=0; i< count; i++) {
     CGPoint point = plot.xPoints[i];
-    CGPathAddLineToPoint(graphPath, NULL, point.x, point.y);
-    CGPathAddLineToPoint(backgroundPath, NULL, point.x, point.y);
-    CGFloat dotsSize = [_themeAttributes[kDotSizeKey] floatValue];
-    CGPathAddEllipseInRect(circlePath, NULL, CGRectMake(point.x - dotsSize/2.0f, point.y - dotsSize/2.0f, dotsSize, dotsSize));
+    NSDictionary *dic = plot.plottingValues[i];
+    __block NSNumber *_key = nil;
+    __block NSNumber *_value = nil;
+    [dic enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
+          _key = (NSNumber *)key;
+          _value = (NSNumber *)obj;
+    }];
+      
+      if (_isMovePot) {
+          if (![_value isEqualToNumber:@0]) {
+              CGPathMoveToPoint(graphPath, NULL, point.x, point.y);
+              CGPathMoveToPoint(backgroundPath, NULL, point.x, self.bounds.size.height - BOTTOM_MARGIN_TO_LEAVE);
+              CGPathAddLineToPoint(backgroundPath, NULL, point.x, point.y);
+              CGFloat dotsSize = [_themeAttributes[kDotSizeKey] floatValue];
+              CGPathAddEllipseInRect(circlePath, NULL, CGRectMake(point.x - dotsSize/2.0f, point.y - dotsSize/2.0f, dotsSize, dotsSize));
+              _isMovePot = NO;
+          }
+      } else {
+          if ([_value isEqualToNumber:@0]) {
+              CGPathMoveToPoint(graphPath, NULL, point.x, point.y);
+              CGPathMoveToPoint(backgroundPath, NULL, point.x, self.bounds.size.height - BOTTOM_MARGIN_TO_LEAVE);
+              CGPathAddLineToPoint(backgroundPath, NULL, point.x, point.y);
+              _isMovePot = YES;
+          }
+          else {
+              CGPathAddLineToPoint(graphPath, NULL, point.x, point.y);
+              CGPathAddLineToPoint(backgroundPath, NULL, point.x, point.y);
+              
+              CGFloat dotsSize = [_themeAttributes[kDotSizeKey] floatValue];
+              CGPathAddEllipseInRect(circlePath, NULL, CGRectMake(point.x - dotsSize/2.0f, point.y - dotsSize/2.0f, dotsSize, dotsSize));
+              
+              int next = [_key intValue];
+              if (next < count) {
+                  NSNumber *nextNumber = [plot.plottingValues[i + 1] objectForKey:[NSNumber numberWithInt:(next + 1)]];
+                  if ([nextNumber isEqualToNumber:@0]) {
+                      CGPathAddLineToPoint(backgroundPath, NULL, point.x, self.bounds.size.height - BOTTOM_MARGIN_TO_LEAVE);
+                  }
+              }
+              
+              if (i == count - 1) {
+                  CGPathAddLineToPoint(backgroundPath, NULL, point.x, self.bounds.size.height - BOTTOM_MARGIN_TO_LEAVE);
+              }
+          }
+          
+      }
+
   }
-  
-  //move to initial point for path and background.
-  CGPathAddLineToPoint(graphPath, NULL, _leftMarginToLeave + PLOT_WIDTH, plot.xPoints[count -1].y);
-  CGPathAddLineToPoint(backgroundPath, NULL, _leftMarginToLeave + PLOT_WIDTH, plot.xPoints[count - 1].y);
-  
-  //additional points for background.
-  CGPathAddLineToPoint(backgroundPath, NULL, _leftMarginToLeave + PLOT_WIDTH, self.bounds.size.height - BOTTOM_MARGIN_TO_LEAVE);
-  CGPathAddLineToPoint(backgroundPath, NULL, _leftMarginToLeave, self.bounds.size.height - BOTTOM_MARGIN_TO_LEAVE);
+    
   CGPathCloseSubpath(backgroundPath);
-  
   backgroundLayer.path = backgroundPath;
   graphLayer.path = graphPath;
   circleLayer.path = circlePath;
@@ -225,19 +256,23 @@
   [self.layer addSublayer:graphLayer];
   [self.layer addSublayer:circleLayer];
   [self.layer addSublayer:backgroundLayer];
-	
+    
+	double xIntervalInPx = PLOT_WIDTH / _xAxisValues.count;
+    
 	NSUInteger count2 = _xAxisValues.count;
+    
 	for(int i=0; i< count2; i++){
 		CGPoint point = plot.xPoints[i];
 		UIButton *btn = [UIButton buttonWithType:UIButtonTypeCustom];
-        
 		btn.backgroundColor = [UIColor clearColor];
 		btn.tag = i;
-		btn.frame = CGRectMake(point.x - 20, point.y - 20, 40, 40);
+		btn.frame = CGRectMake(point.x - xIntervalInPx/2, point.y - xIntervalInPx/2, xIntervalInPx, xIntervalInPx);
+        
 		[btn addTarget:self action:@selector(clicked:) forControlEvents:UIControlEventTouchUpInside];
+        
 		objc_setAssociatedObject(btn, kAssociatedPlotObject, plot, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-    
-    [self addSubview:btn];
+        
+        [self addSubview:btn];
 	}
 }
 
@@ -250,7 +285,7 @@
   
   for(int i=0; i < xIntervalCount; i++){
     CGPoint currentLabelPoint = CGPointMake((xIntervalInPx * i) + _leftMarginToLeave, self.bounds.size.height - BOTTOM_MARGIN_TO_LEAVE);
-    CGRect xLabelFrame = CGRectMake(currentLabelPoint.x , currentLabelPoint.y, xIntervalInPx, BOTTOM_MARGIN_TO_LEAVE);
+    CGRect xLabelFrame = CGRectMake(currentLabelPoint.x - xIntervalInPx/2 , currentLabelPoint.y, xIntervalInPx, BOTTOM_MARGIN_TO_LEAVE);
     
     plot.xPoints[i] = CGPointMake((int) xLabelFrame.origin.x + (xLabelFrame.size.width /2) , (int) 0);
     
@@ -275,7 +310,7 @@
 - (void)drawYLabels:(SHPlot *)plot {
   double yRange = [_yAxisRange doubleValue]; // this value will be in dollars
   double yIntervalValue = yRange / INTERVAL_COUNT;
-  double intervalInPx = (self.bounds.size.height - BOTTOM_MARGIN_TO_LEAVE ) / (INTERVAL_COUNT +1);
+  double intervalInPx = (self.bounds.size.height - BOTTOM_MARGIN_TO_LEAVE ) / (INTERVAL_COUNT + 1);
   
   NSMutableArray *labelArray = [NSMutableArray array];
   float maxWidth = 0;
@@ -290,7 +325,7 @@
       yAxisLabel.font = (UIFont *)_themeAttributes[kYAxisLabelFontKey];
       yAxisLabel.textColor = (UIColor *)_themeAttributes[kYAxisLabelColorKey];
       yAxisLabel.textAlignment = NSTextAlignmentCenter;
-      float val = (yIntervalValue * (10 - i));
+      float val = (yIntervalValue * (INTERVAL_COUNT - i + 1));
       if(val > 0){
         yAxisLabel.text = [NSString stringWithFormat:@"%.1f%@", val, _yAxisSuffix];
       } else {
@@ -327,20 +362,42 @@
   linesLayer.backgroundColor = [UIColor clearColor].CGColor;
   linesLayer.strokeColor = ((UIColor *)_themeAttributes[kPlotBackgroundLineColorKey]).CGColor;
   linesLayer.lineWidth = 1;
+    
+    CAShapeLayer *scaleLayer = [CAShapeLayer layer];
+    scaleLayer.frame = self.bounds;
+    scaleLayer.fillColor = [UIColor clearColor].CGColor;
+    scaleLayer.backgroundColor = [UIColor clearColor].CGColor;
+    scaleLayer.strokeColor = ((UIColor *)_themeAttributes[kPlotBackgroundLineColorKey]).CGColor;
+    scaleLayer.lineWidth = 1;
   
   CGMutablePathRef linesPath = CGPathCreateMutable();
+  CGMutablePathRef scalePath = CGPathCreateMutable();
   
-  double intervalInPx = (self.bounds.size.height - BOTTOM_MARGIN_TO_LEAVE) / (INTERVAL_COUNT + 1);
+  double intervalInPy = (self.bounds.size.height - BOTTOM_MARGIN_TO_LEAVE) / (INTERVAL_COUNT + 1);
+    
   for(int i= INTERVAL_COUNT + 1; i > 0; i--){
-    
-    CGPoint currentLinePoint = CGPointMake(_leftMarginToLeave, (i * intervalInPx));
-    
+    CGPoint currentLinePoint = CGPointMake(_leftMarginToLeave, (i * intervalInPy));
     CGPathMoveToPoint(linesPath, NULL, currentLinePoint.x, currentLinePoint.y);
     CGPathAddLineToPoint(linesPath, NULL, currentLinePoint.x + PLOT_WIDTH, currentLinePoint.y);
+    if (i == 1) {
+          for (int i = 0; i < _xAxisValues.count; i++) {
+              CGPoint zPoint = CGPointMake((_leftMarginToLeave + (PLOT_WIDTH / _xAxisValues.count)*(i)), currentLinePoint.y);
+              CGPathMoveToPoint(scalePath, NULL, zPoint.x, zPoint.y - 2);
+              CGPathAddLineToPoint(scalePath, NULL, zPoint.x, currentLinePoint.y - SCALEHEIGHT);
+          }
+        CGPathMoveToPoint(scalePath, NULL, currentLinePoint.x, currentLinePoint.y);
+        CGPathAddLineToPoint(scalePath, NULL, currentLinePoint.x, self.bounds.size.height - BOTTOM_MARGIN_TO_LEAVE);
+        
+        CGPathMoveToPoint(scalePath, NULL, currentLinePoint.x + PLOT_WIDTH, currentLinePoint.y);
+        CGPathAddLineToPoint(scalePath, NULL, currentLinePoint.x + PLOT_WIDTH, self.bounds.size.height - BOTTOM_MARGIN_TO_LEAVE);
+      }
   }
   
   linesLayer.path = linesPath;
+  scaleLayer.path = scalePath;
+  
   [self.layer addSublayer:linesLayer];
+  [self.layer addSublayer:scaleLayer];
 }
 
 #pragma mark - UIButton event methods
@@ -348,12 +405,17 @@
 - (void)clicked:(id)sender
 {
 	@try {
-		UILabel *lbl = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 120, 30)];
+        double xIntervalInPx = PLOT_WIDTH / _xAxisValues.count;
+        
+		UILabel *lbl = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 30, 30)];
 		lbl.backgroundColor = [UIColor clearColor];
-    UIButton *btn = (UIButton *)sender;
+        
+        UIButton *btn = (UIButton *)sender;
+        
 		NSUInteger tag = btn.tag;
     
-    SHPlot *_plot = objc_getAssociatedObject(btn, kAssociatedPlotObject);
+        SHPlot *_plot = objc_getAssociatedObject(btn, kAssociatedPlotObject);
+        
 		NSString *text = [_plot.plottingPointsLabels objectAtIndex:tag];
 		
 		lbl.text = text;
@@ -364,14 +426,17 @@
 		lbl.frame = CGRectMake(0, 0, lbl.frame.size.width + 5, lbl.frame.size.height);
 		
 		CGPoint point =((UIButton *)sender).center;
-		point.y -= 15;
-		
-		dispatch_async(dispatch_get_main_queue(), ^{
-			[PopoverView showPopoverAtPoint:point
-                               inView:self
-                      withContentView:lbl
-                             delegate:nil];
-		});
+        
+		point.y -= xIntervalInPx / 2;
+        
+        if (![text isEqualToString:@"0"]) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [PopoverView showPopoverAtPoint:point
+                                         inView:self
+                                withContentView:lbl
+                                       delegate:nil];
+            });
+        }
 	}
 	@catch (NSException *exception) {
 		NSLog(@"plotting label is not available for this point");
