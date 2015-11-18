@@ -39,15 +39,15 @@
    *  theme attributes dictionary. you can specify graph theme releated attributes in this dictionary. if this property is
    *  nil, then a default theme setting is applied to the graph.
    */
-  NSDictionary *_themeAttributes = @{
-                                     kXAxisLabelColorKey : [UIColor colorWithRed:0.48 green:0.48 blue:0.49 alpha:0.4],
-                                     kXAxisLabelFontKey : [UIFont fontWithName:@"TrebuchetMS" size:10],
-                                     kYAxisLabelColorKey : [UIColor colorWithRed:0.48 green:0.48 blue:0.49 alpha:0.4],
-                                     kYAxisLabelFontKey : [UIFont fontWithName:@"TrebuchetMS" size:10],
-                                     kYAxisLabelSideMarginsKey : @20,
-                                     kPlotBackgroundLineColorKey : [UIColor colorWithRed:0.48 green:0.48 blue:0.49 alpha:0.4],
-                                     kDotSizeKey : @10
-                                     };
+    NSDictionary *_themeAttributes = @{
+                                       kXAxisLabelColorKey : [UIColor colorWithRed:0.48 green:0.48 blue:0.49 alpha:0.4],
+                                       kXAxisLabelFontKey : [UIFont fontWithName:@"TrebuchetMS" size:10],
+                                       kYAxisLabelColorKey : [UIColor colorWithRed:0.48 green:0.48 blue:0.49 alpha:0.4],
+                                       kYAxisLabelFontKey : [UIFont fontWithName:@"TrebuchetMS" size:10],
+                                       kYAxisLabelSideMarginsKey : @8,
+                                       kPlotBackgroundLineColorKey : [UIColor colorWithRed:0.48 green:0.48 blue:0.49 alpha:0.4],
+                                       kDotSizeKey : @6
+                                       };
   _lineGraph.themeAttributes = _themeAttributes;
   
   //set the line graph attributes
@@ -115,7 +115,7 @@
    *  a particular points, a popover view is shown and will show the particular label on for that point, that is specified
    *  in this array.
    */
-  NSArray *arr = @[@"1", @"2", @"3", @"4", @"5", @"6" , @"7" , @"8", @"9", @"10", @"11", @"12"];
+  NSArray *arr = @[@"65.8", @"20", @"23", @"22", @"12.3", @"45.8" , @"56" , @"97", @"65", @"10", @"67", @"23"];
   _plot1.plottingPointsLabels = arr;
   
   //set plot theme attributes
@@ -125,13 +125,13 @@
    *  is applied selected and the graph is plotted with those default settings.
    */
   
-  NSDictionary *_plotThemeAttributes = @{
-                                         kPlotFillColorKey : [UIColor colorWithRed:0.47 green:0.75 blue:0.78 alpha:0.5],
-                                         kPlotStrokeWidthKey : @2,
-                                         kPlotStrokeColorKey : [UIColor colorWithRed:0.18 green:0.36 blue:0.41 alpha:1],
-                                         kPlotPointFillColorKey : [UIColor colorWithRed:0.18 green:0.36 blue:0.41 alpha:1],
-                                         kPlotPointValueFontKey : [UIFont fontWithName:@"TrebuchetMS" size:18]
-                                         };
+    NSDictionary *_plotThemeAttributes = @{
+                                           kPlotFillColorKey : [UIColor colorWithRed:201/255.f green:239/255.f blue:224/255.f alpha:0.6],
+                                           kPlotStrokeWidthKey : @1,
+                                           kPlotStrokeColorKey : [UIColor colorWithRed:27/255.f green:187/255.f blue:120/255.f alpha:1],
+                                           kPlotPointFillColorKey : [UIColor colorWithRed:27/255.f green:187/255.f blue:120/255.f alpha:1],
+                                           kPlotPointValueFontKey : [UIFont fontWithName:@"TrebuchetMS" size:18]
+                                           };
   
   _plot1.plotThemeAttributes = _plotThemeAttributes;
   [_lineGraph addPlot:_plot1];
