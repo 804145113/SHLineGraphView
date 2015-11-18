@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A341D1631BFC0CD700DC9E32 /* Launch Screen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A341D1621BFC0CD700DC9E32 /* Launch Screen.storyboard */; };
 		F259AE0018DE03060070E137 /* SHRootController.m in Sources */ = {isa = PBXBuildFile; fileRef = F259ADFF18DE03060070E137 /* SHRootController.m */; };
 		F266044118DDF5210084DCEF /* SHPlot.m in Sources */ = {isa = PBXBuildFile; fileRef = F266044018DDF5210084DCEF /* SHPlot.m */; };
 		F2F9135B18D3E8B8002D6919 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F2F9135A18D3E8B8002D6919 /* Foundation.framework */; };
@@ -36,6 +37,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		A341D1621BFC0CD700DC9E32 /* Launch Screen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = "Launch Screen.storyboard"; path = "../Launch Screen.storyboard"; sourceTree = "<group>"; };
 		F259ADFE18DE03060070E137 /* SHRootController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SHRootController.h; sourceTree = "<group>"; };
 		F259ADFF18DE03060070E137 /* SHRootController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SHRootController.m; sourceTree = "<group>"; };
 		F266043F18DDF5210084DCEF /* SHPlot.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SHPlot.h; sourceTree = "<group>"; };
@@ -124,6 +126,7 @@
 				F2F9138918D403CE002D6919 /* SHLineGraphView */,
 				F2F9136918D3E8B8002D6919 /* SHAppDelegate.h */,
 				F2F9136A18D3E8B8002D6919 /* SHAppDelegate.m */,
+				A341D1621BFC0CD700DC9E32 /* Launch Screen.storyboard */,
 				F2F9136C18D3E8B8002D6919 /* Images.xcassets */,
 				F2F9136118D3E8B8002D6919 /* Supporting Files */,
 				F259ADFE18DE03060070E137 /* SHRootController.h */,
@@ -252,6 +255,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A341D1631BFC0CD700DC9E32 /* Launch Screen.storyboard in Resources */,
 				F2F9136518D3E8B8002D6919 /* InfoPlist.strings in Resources */,
 				F2F9136D18D3E8B8002D6919 /* Images.xcassets in Resources */,
 			);
@@ -401,6 +405,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "SHLineGraphView/SHLineGraphView-Prefix.pch";
 				INFOPLIST_FILE = "SHLineGraphView/SHLineGraphView-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -414,6 +419,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "SHLineGraphView/SHLineGraphView-Prefix.pch";
 				INFOPLIST_FILE = "SHLineGraphView/SHLineGraphView-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};

@@ -31,7 +31,7 @@
   // Do any additional setup after loading the view.
   
   //initate the graph view
-  SHLineGraphView *_lineGraph = [[SHLineGraphView alloc] initWithFrame:CGRectMake(0, 0, 568, 320)];
+  SHLineGraphView *_lineGraph = [[SHLineGraphView alloc] initWithFrame:CGRectMake(0, 0, 320, 320)];
   
   //set the main graph area theme attributes
 
@@ -141,28 +141,6 @@
   [_lineGraph setupTheView];
   
   [self.view addSubview:_lineGraph];
-}
-
-- (void)didReceiveMemoryWarning
-{
-  [super didReceiveMemoryWarning];
-  // Dispose of any resources that can be recreated.
-}
-
-- (BOOL)shouldAutorotate
-{
-	return YES;
-}
-
-- (UIInterfaceOrientation)preferredInterfaceOrientationForPresentation
-{
-	return UIInterfaceOrientationLandscapeLeft;
-}
-
-
-- (NSUInteger)supportedInterfaceOrientations
-{
-	return UIInterfaceOrientationMaskLandscapeLeft | UIInterfaceOrientationMaskLandscapeRight;
 }
 
 @end
